@@ -13,41 +13,28 @@ namespace Hazel {
 
 	void OrthographicCameraController::OnUpdate(Timestep ts)
 	{
-		if (Input::IsKeyPressed(HZ_KEY_A))
-		{
-			m_CameraPosition.x -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-			m_CameraPosition.y -= sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-		}
-		else if (Input::IsKeyPressed(HZ_KEY_D))
-		{
-			m_CameraPosition.x += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-			m_CameraPosition.y += sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-		}
+		float dTranslationSpeed = m_CameraTranslationSpeed * ts;
+		float dRotationRot      = m_CameraRotationSpeed * ts;
+		float theta = m_CameraRotation;
+		float dX = cos(glm::radians(theta));
+		float dY = sin(glm::radians(theta));
+		
+		if (Input::IsKeyPressed(HZ_KEY_A)) decreasePosition(dX * m_CameraTranslationSpeed, dY * m_CameraTranslationSpeed);
+		if (Input::IsKeyPressed(HZ_KEY_D)) increasePosition(dX * m_CameraTranslationSpeed, dY * m_CameraTranslationSpeed);
+		if (Input::IsKeyPressed(HZ_KEY_W)) increasePosition(-dY * m_CameraTranslationSpeed, dX * m_CameraTranslationSpeed);
+		if (Input::IsKeyPressed(HZ_KEY_S)) decreasePosition(-dY * m_CameraTranslationSpeed, dX * m_CameraTranslationSpeed);
 
-		if (Input::IsKeyPressed(HZ_KEY_W))
+		if (rotation)
 		{
-			m_CameraPosition.x += -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-			m_CameraPosition.y += cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-		}
-		else if (Input::IsKeyPressed(HZ_KEY_S))
-		{
-			m_CameraPosition.x -= -sin(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-			m_CameraPosition.y -= cos(glm::radians(m_CameraRotation)) * m_CameraTranslationSpeed * ts;
-		}
+			if (Input::IsKeyPressed(HZ_KEY_Q)) decreaseRotation(dRotationRot);
+			if (Input::IsKeyPressed(HZ_KEY_E)) increaseRotation(dRotationRot);
 
-		if (m_Rotation)
-		{
-			if (Input::IsKeyPressed(HZ_KEY_Q))
-				m_CameraRotation += m_CameraRotationSpeed * ts;
-			if (Input::IsKeyPressed(HZ_KEY_E))
-				m_CameraRotation -= m_CameraRotationSpeed * ts;
-
-			if (m_CameraRotation > 180.0f)
-				m_CameraRotation -= 360.0f;
-			else if (m_CameraRotation <= -180.0f)
-				m_CameraRotation += 360.0f;
-
-			m_Camera.SetRotation(m_CameraRotation);
+			if (m_CameraRotation >= 360)
+				m_CameraRotation = 0;
+			else if (m_CameraRotation <= -360)
+				m_CameraRotation = 0;
+			
+			m_Camera.setRotation(m_CameraRotation);
 		}
 
 		m_Camera.SetPosition(m_CameraPosition);
